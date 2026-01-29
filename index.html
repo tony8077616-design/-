@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>自閉症友善大使小測驗</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 24px;
+      margin-top: 24px;
+    }
+    h1, h2 {
+      margin: 0 0 12px;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #1f4fc9;
+    }
+    h2 {
+      font-size: 1.2rem;
+      color: #333;
+    }
+    .intro {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.6;
+    }
+    .question-text {
+      font-size: 1.05rem;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px;
+    }
+    .options li {
+      margin-bottom: 10px;
+    }
+    .options label {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d3daf0;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      font-size: 0.98rem;
+    }
+    .options input {
+      display: none;
+    }
+    .options input:checked + span {
+      background: #e6eeff;
+      border-color: #1f4fc9;
+    }
+    .options span {
+      display: block;
+      border-radius: 8px;
+      padding: 8px 10px;
+      border: 1px solid transparent;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.05s;
+    }
+    .btn-primary {
+      background: #1f4fc9;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #163ba0;
+    }
+    .btn-secondary {
+      background: #e1e6f5;
+      color: #333;
+    }
+    .btn-secondary:hover {
+      background: #ccd4f0;
+    }
+    button:active {
+      transform: scale(0.97);
+    }
+    .hint {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #f3f6ff;
+      border-left: 4px solid #1f4fc9;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .hint-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .feedback {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .correct {
+      color: #1c7c2a;
+    }
+    .incorrect {
+      color: #c62828;
+    }
+    .progress {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .score-big {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1f4fc9;
+      margin-bottom: 8px;
+    }
+    .result-text {
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+    .badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #e8f5e9;
+      color: #1b5e20;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    @media (max-width: 600px) {
+      .card {
+        padding: 16px;
+      }
+      .btn-row {
+        flex-direction: column-reverse;
+        align-items: stretch;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 開始畫面：包含名字輸入 -->
+    <div class="card" id="start-screen">
+      <h1>🌟 挑戰：成為自閉症友善大使</h1>
+      <p class="intro">
+        先輸入你的名字，再開始 6 題小測驗。<br>
+        每題作答後會看到正確答案與「大使秘笈」，一步步學習如何成為友善大使。
+      </p>
+
+      <label for="user-name" style="font-size:0.95rem;display:block;margin-bottom:6px;">
+        請輸入你的名字（或暱稱）：
+      </label>
+      <input
+        id="user-name"
+        type="text"
+        placeholder="例如：小明、小美"
+        style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d3daf0;font-size:0.95rem;box-sizing:border-box;margin-bottom:14px;"
+      />
+
+      <button class="btn-primary" onclick="startQuiz()">開始挑戰</button>
+    </div>
+
+    <!-- 測驗畫面 -->
+    <div class="card" id="quiz-screen" style="display:none;">
+      <div class="progress" id="progress-text"></div>
+      <h2 id="question-title"></h2>
+      <p class="question-text" id="question-text"></p>
+      <ul class="options" id="options-list"></ul>
+      <div class="feedback" id="feedback"></div>
+      <div class="hint" id="hint" style="display:none;">
+        <div class="hint-title">💡 大使秘笈：</div>
+        <div id="hint-text"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="prevQuestion()">上一題</button>
+        <button class="btn-primary" id="next-btn" onclick="nextQuestion()">下一題</button>
+      </div>
+    </div>
+
+    <!-- 結果畫面：會顯示名字 -->
+    <div class="card" id="result-screen" style="display:none;">
+      <h1>測驗完成 🎉</h1>
+      <p id="user-greeting" style="font-size:1rem;margin:8px 0 12px;"></p>
+      <div class="score-big" id="score-text"></div>
+      <p class="result-text" id="result-detail"></p>
+      <span class="badge" id="badge-text"></span>
+      <div class="btn-row" style="margin-top:20px;">
+        <button class="btn-secondary" onclick="restartQuiz()">再做一次</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 把這裡換成你自己的 Apps Script Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVF_S_XOkqTMJ_aAFc0O1PU0e_lpNiBUMqV1zP2hW4wR8YPdOqXLrZPoq9ZvqhvDF1/exec";
+
+    const questions = [
+      {
+        title: "Q1",
+        text: "請問下列哪些症狀是自閉症類群的常見特質？",
+        options: [
+          "(A) 顯著的社交溝通困難、固著行為與感官異常",
+          "(B) 只有暴力攻擊行為與情緒失控",
+          "(C) 喜歡故意說謊與惡作劇"
+        ],
+        correctIndex: 0,
+        hint: "根據鑑定辦法與特徵介紹，自閉症的核心特質包含「顯著的社交溝通及互動困難」以及「固定而有限的行為模式及興趣」（如固著行為、狹隘興趣、感官過敏等）。"
+      },
+      {
+        title: "Q2",
+        text: "當自閉症同學出現「甩手」或「身體搖晃」等重複動作時，身為友善大使該怎麼做？",
+        options: [
+          "(A) 大聲制止他，叫他坐好",
+          "(B) 覺得很奇怪，一直盯著他看或模仿他",
+          "(C) 理解這是他自我放鬆或調節焦慮的方式，只要不影響別人，就給予尊重"
+        ],
+        correctIndex: 2,
+        hint: "這些「刻板動作（Stimming）」通常是他們在興奮、焦慮或無聊時，用來讓大腦放鬆和自我調節的方式，並不需要刻意矯正或嘲笑。"
+      },
+      {
+        title: "Q3",
+        text: "與自閉症同學說話時，為了避免誤會，哪種溝通方式最適合？",
+        options: [
+          "(A) 說話直接具體，避免使用諷刺、開玩笑或拐彎抹角的方式",
+          "(B) 多用成語和雙關語，比較幽默風趣",
+          "(C) 講反話，例如覺得他做不好時故意誇獎他"
+        ],
+        correctIndex: 0,
+        hint: "自閉症者對於語言理解較為字面，容易聽不懂潛台詞或反諷（例如把諷刺當稱讚），所以「直接說」是最好的溝通方式。"
+      },
+      {
+        title: "Q4",
+        text: "你發現自閉症同學聽到學校鐘聲或廣播聲時會痛苦地摀住耳朵，這可能是因為？",
+        options: [
+          "(A) 他想要引人注意",
+          "(C) 他的感官過度敏感，覺得聲音像針刺一樣痛苦",
+          "(D) 他的聽力不好"
+        ],
+        correctIndex: 1,
+        hint: "這是「感官異常」的一種表現，對一般人正常的聲音，對他們來說可能分貝過高且刺耳，請不要故意製造噪音刺激他。"
+      },
+      {
+        title: "Q5",
+        text: "某次你想邀請自閉症同學一起行動，但他拒絕或是完全不理你，這時候該怎麼辦？",
+        options: [
+          "(A) 強迫他一定要加入大家",
+          "(B) 尊重他的意願，理解他可能現在只想獨處",
+          "(C) 聯合其他同學以後都不理他"
+        ],
+        correctIndex: 1,
+        hint: "主動邀請是很棒的善意，但如果他拒絕或沒反應，可能只是因為他需要休息空間，請尊重他的拒絕，不要覺得受傷。"
+      },
+      {
+        title: "Q6",
+        text: "請問下列哪些病症都算是自閉症？",
+        options: [
+          "(A) 亞斯伯格",
+          "(B) 高功能 / 低功能自閉症",
+          "(C) 以上皆是"
+        ],
+        correctIndex: 2,
+        hint: "「自閉症類群」包含亞斯伯格、高功能與低功能自閉症等不同表現型，雖然能力差異很大，但都屬於自閉症光譜的一部分。"
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let userName = "";
+    const answers = new Array(questions.length).fill(null);
+
+    const startScreen = document.getElementById("start-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const resultScreen = document.getElementById("result-screen");
+    const progressText = document.getElementById("progress-text");
+    const questionTitle = document.getElementById("question-title");
+    const questionText = document.getElementById("question-text");
+    const optionsList = document.getElementById("options-list");
+    const feedback = document.getElementById("feedback");
+    const hintBox = document.getElementById("hint");
+    const hintText = document.getElementById("hint-text");
+    const nextBtn = document.getElementById("next-btn");
+    const scoreText = document.getElementById("score-text");
+    const resultDetail = document.getElementById("result-detail");
+    const badgeText = document.getElementById("badge-text");
+    const userNameInput = document.getElementById("user-name");
+    const userGreeting = document.getElementById("user-greeting");
+
+    function startQuiz() {
+      const name = userNameInput.value.trim();
+      if (!name) {
+        alert("請先輸入你的名字或暱稱，再開始挑戰喔！");
+        return;
+      }
+      userName = name;
+
+      startScreen.style.display = "none";
+      resultScreen.style.display = "none";
+      quizScreen.style.display = "block";
+      current = 0;
+      score = 0;
+      for (let i = 0; i < answers.length; i++) {
+        answers[i] = null;
+      }
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = questions[current];
+      progressText.textContent = `第 ${current + 1} 題 / 共 ${questions.length} 題`;
+      questionTitle.textContent = q.title;
+      questionText.textContent = q.text;
+      optionsList.innerHTML = "";
+      feedback.textContent = "";
+      feedback.className = "feedback";
+      hintBox.style.display = "none";
+      hintText.textContent = "";
+
+      q.options.forEach((opt, index) => {
+        const li = document.createElement("li");
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "option";
+        input.value = index;
+
+        const span = document.createElement("span");
+        span.textContent = opt;
+
+        label.appendChild(input);
+        label.appendChild(span);
+        li.appendChild(label);
+        optionsList.appendChild(li);
+
+        label.addEventListener("click", () => {
+          selectAnswer(index);
+          input.checked = true;
+        });
+      });
+
+      nextBtn.textContent = current === questions.length - 1 ? "看結果" : "下一題";
+    }
+
+    function selectAnswer(index) {
+      const q = questions[current];
+      const isCorrect = index === q.correctIndex;
+
+      // 記錄原始作答（給後台用）
+      answers[current] = index;
+
+      feedback.textContent = isCorrect ? "✅ 回答正確！" : "❌ 這題可以再想想，下方有提示喔。";
+      feedback.className = "feedback " + (isCorrect ? "correct" : "incorrect");
+      hintBox.style.display = "block";
+      hintText.textContent = q.hint;
+    }
+
+    function nextQuestion() {
+      if (current < questions.length - 1) {
+        current++;
+        renderQuestion();
+      } else {
+        calculateScore();
+        showResult();
+        sendResultToSheet();
+      }
+    }
+
+    function prevQuestion() {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    }
+
+    function calculateScore() {
+      score = 0;
+      for (let i = 0; i < questions.length; i++) {
+        if (answers[i] === questions[i].correctIndex) {
+          score++;
+        }
+      }
+    }
+
+    function showResult() {
+      quizScreen.style.display = "none";
+      resultScreen.style.display = "block";
+
+      userGreeting.textContent = `${userName}，這是你的成績：`;
+      scoreText.textContent = `${score} / ${questions.length} 分`;
+
+      let msg = "";
+      let badge = "";
+      if (score === questions.length) {
+        msg = "太厲害了！你對自閉症特質與友善相處方式非常熟悉，已經具備成為「自閉症友善大使」的知識與態度。";
+        badge = "⭐ 自閉症友善大使 LV.3：超專業";
+      } else if (score >= 4) {
+        msg = "很不錯，你已經掌握多數重要觀念，再多練習幾次、在生活中多觀察，就能更加理解自閉症同學的需要。";
+        badge = "⭐ 自閉症友善大使 LV.2：進階版";
+      } else {
+        msg = "這是一個開始，只要願意學習和練習，你也可以成為很棒的友善大使。可以回去重做看看，搭配秘笈一起學。";
+        badge = "⭐ 自閉症友善大使 LV.1：入門版";
+      }
+
+      resultDetail.textContent = msg;
+      badgeText.textContent = badge;
+    }
+
+    function sendResultToSheet() {
+      if (!SCRIPT_URL || SCRIPT_URL.indexOf("script.google.com") === -1) {
+        console.warn("SCRIPT_URL 尚未設定或設定錯誤，無法送出成績。");
+        return;
+      }
+
+      const payload = {
+        name: userName,
+        score: score,
+        total: questions.length,
+        answers: answers
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }).catch(err => {
+        console.error("送出成績時發生錯誤：", err);
+      });
+    }
+
+    function restartQuiz() {
+      startScreen.style.display = "block";
+      quizScreen.style.display = "none";
+      resultScreen.style.display = "none";
+    }
+
+    window.startQuiz = startQuiz;
+    window.nextQuestion = nextQuestion;
+    window.prevQuestion = prevQuestion;
+    window.restartQuiz = restartQuiz;
+  </script>
+</body>
+</html>
